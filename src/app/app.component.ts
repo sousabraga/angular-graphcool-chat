@@ -13,7 +13,6 @@ export class AppComponent {
   constructor(
     private apollo: Apollo
   ) {
-    this.createUser('Cesar Barbosa', 'cesar@gmail.com', '123456');
     this.allUsers();
   }
 
