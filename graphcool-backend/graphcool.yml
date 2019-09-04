@@ -20,20 +20,20 @@ types: ./types.graphql
 
 functions:
 
-# added by email-password template: (please uncomment)
-# 
-#   signup:
-#     type: resolver
-#     schema: src/email-password/signup.graphql
-#     handler:
-#       code: src/email-password/signup.ts
-# 
+# added by email-password template:
+
+  signup:
+    type: resolver
+    schema: src/email-password/signup.graphql
+    handler:
+      code: src/email-password/signup.ts
+
 #   authenticate:
 #     type: resolver
 #     schema: src/email-password/authenticate.graphql
 #     handler:
 #       code: src/email-password/authenticate.ts
-# 
+#
 #   loggedInUser:
 #     type: resolver
 #     schema: src/email-password/loggedInUser.graphql
