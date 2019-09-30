@@ -94,6 +94,14 @@ export class LoginComponent implements OnInit, OnDestroy {
     return this.loginForm.get('name') as FormControl;
   }
 
+  isKeepSigned(): boolean {
+    return this.authService.keepSigned;
+  }
+
+  toggleKeepSigned(): void {
+    this.authService.toggleKeepSigned();
+  }
+
   ngOnDestroy(): void {
     this.alive = false;
   }

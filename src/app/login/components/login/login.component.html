@@ -41,6 +41,8 @@
           </mat-error>
         </mat-form-field>
 
+        <mat-slide-toggle [checked]="isKeepSigned()" (change)="toggleKeepSigned()">Keep me signed in</mat-slide-toggle>
+
         <button type="submit" mat-button color="primary" [disabled]="loginForm.invalid">{{ configs.actionText }}</button>
         <button type="button" mat-button color="primary" (click)="changeAction()">{{ configs.buttonActionText }}</button>
       </form>

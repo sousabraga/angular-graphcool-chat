@@ -13,12 +13,18 @@ import { StorageKeys } from 'src/app/storage.keys';
 export class AuthService {
 
   redirectUrl: string;
+  keepSigned: boolean;
   private authenticationObserver = new ReplaySubject<boolean>(1);
 
   constructor(
     private apollo: Apollo
   ) {
     this.isAuthenticated.subscribe(isAuthenticated => console.log('AuthState', isAuthenticated));
+    this.init();
+  }
+
+  init(): void {
+    this.keepSigned = JSON.parse(window.localStorage.getItem(StorageKeys.KEEP_SIGNED));
   }
 
   get isAuthenticated(): Observable<boolean> {
@@ -55,6 +61,11 @@ export class AuthService {
         return throwError(err);
       })
     );
+  }
+
+  toggleKeepSigned(): void {
+    this.keepSigned = !this.keepSigned;
+    window.localStorage.setItem(StorageKeys.KEEP_SIGNED, this.keepSigned.toString());
   }
 
   private setAuthState(authData: {token: string, isAuthenticated: boolean}): void {
