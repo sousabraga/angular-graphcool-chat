@@ -11,12 +11,13 @@ import { AUTHENTICATE_USER_MUTATION, SIGNUP_USER_MUTATION } from './auth.graphql
 })
 export class AuthService {
 
+  redirectUrl: string;
   private authenticationObserver = new ReplaySubject<boolean>(1);
 
   constructor(
     private apollo: Apollo
   ) {
-    this.isAuthenticated.subscribe(res => console.log('AuthState', res));
+    this.isAuthenticated.subscribe(isAuthenticated => console.log('AuthState', isAuthenticated));
   }
 
   get isAuthenticated(): Observable<boolean> {
