@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Inject } from '@angular/core';
 import { HttpClientModule, HttpHeaders } from '@angular/common/http';
 
 import { ApolloModule, Apollo } from 'apollo-angular';
@@ -9,6 +9,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 
 import { environment } from 'src/environments/environment.prod';
 import { StorageKeys } from './storage.keys';
+import { GraphcoolConfig, GRAPHCOOL_CONFIG } from './core/providers/graphcool-config.provider';
 
 @NgModule({
   imports: [
@@ -21,9 +22,10 @@ export class ApolloConfigModule {
 
     constructor(
       private apollo: Apollo,
+      @Inject(GRAPHCOOL_CONFIG) private graphcoolConfig: GraphcoolConfig,
       private httpLink: HttpLink
     ) {
-      const uri = 'https://api.graph.cool/simple/v1/cjz2vgfcp672201734p37zaqz';
+      const uri = graphcoolConfig.simpleAPI;
       const http = this.httpLink.create({ uri });
 
       const authMiddleware: ApolloLink = new ApolloLink((operation, forward) => {
