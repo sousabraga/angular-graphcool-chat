@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { Observable, ReplaySubject, throwError, of } from 'rxjs';
-import { tap, catchError, map, mergeMap, finalize } from 'rxjs/operators';
+import { tap, catchError, map, mergeMap } from 'rxjs/operators';
 
 import { Apollo } from 'apollo-angular';
 
@@ -17,7 +19,8 @@ export class AuthService {
   private authenticationObserver = new ReplaySubject<boolean>(1);
 
   constructor(
-    private apollo: Apollo
+    private apollo: Apollo,
+    private router: Router
   ) {
     this.isAuthenticated.subscribe(isAuthenticated => console.log('AuthState', isAuthenticated));
     this.init();
@@ -70,6 +73,16 @@ export class AuthService {
   toggleKeepSigned(): void {
     this.keepSigned = !this.keepSigned;
     window.localStorage.setItem(StorageKeys.KEEP_SIGNED, this.keepSigned.toString());
+  }
+
+  logout(): void {
+    window.localStorage.removeItem(StorageKeys.KEEP_SIGNED);
+    window.localStorage.removeItem(StorageKeys.AUTH_TOKEN);
+    this.keepSigned = false;
+    this.authenticationObserver.next(false);
+
+    this.apollo.getClient().resetStore();
+    this.router.navigate(['/login']);
   }
 
   autoLogin(): Observable<void> {
