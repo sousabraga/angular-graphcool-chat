@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, throwError } from 'rxjs';
-import { tap, catchError, map } from 'rxjs/operators';
+import { Observable, ReplaySubject, throwError, of } from 'rxjs';
+import { tap, catchError, map, mergeMap, finalize } from 'rxjs/operators';
 
 import { Apollo } from 'apollo-angular';
 
@@ -21,11 +21,6 @@ export class AuthService {
   ) {
     this.isAuthenticated.subscribe(isAuthenticated => console.log('AuthState', isAuthenticated));
     this.init();
-
-    this.validateToken().subscribe(
-      res => console.log('Res', res),
-      err => console.log('Err', err)
-    );
   }
 
   init(): void {
@@ -42,8 +37,10 @@ export class AuthService {
       variables
     }).pipe(
       tap(res => {
-        const authenticateUser = res.data.authenticateUser;
-        this.setAuthState({ token: authenticateUser && authenticateUser.token, isAuthenticated: res !== null });
+        if (res && res.data && res.data.authenticateUser) {
+          const authenticateUser = res.data.authenticateUser;
+          this.setAuthState({ token: authenticateUser.token, isAuthenticated: res !== null });
+        }
       }),
       catchError(err => {
         this.setAuthState({ token: null, isAuthenticated: false });
@@ -58,8 +55,10 @@ export class AuthService {
       variables
     }).pipe(
       tap(res => {
-        const authenticateUser = res.data.authenticateUser;
-        this.setAuthState({ token: authenticateUser && authenticateUser.token, isAuthenticated: res !== null });
+        if (res && res.data && res.data.authenticateUser) {
+          const authenticateUser = res.data.authenticateUser;
+          this.setAuthState({ token: authenticateUser.token, isAuthenticated: res !== null });
+        }
       }),
       catchError(err => {
         this.setAuthState({ token: null, isAuthenticated: false });
@@ -71,6 +70,29 @@ export class AuthService {
   toggleKeepSigned(): void {
     this.keepSigned = !this.keepSigned;
     window.localStorage.setItem(StorageKeys.KEEP_SIGNED, this.keepSigned.toString());
+  }
+
+  autoLogin(): Observable<void> {
+    if (!this.keepSigned) {
+      this.authenticationObserver.next(false);
+      window.localStorage.removeItem(StorageKeys.AUTH_TOKEN);
+
+      return of();
+    }
+
+    return this.validateToken()
+      .pipe(
+        tap(authData => {
+          const token = window.localStorage.getItem(StorageKeys.AUTH_TOKEN);
+
+          this.setAuthState({token, isAuthenticated: authData.isAuthenticated})
+        }),
+        mergeMap(res => of<void>()),
+        catchError(err => {
+          this.setAuthState({token: null, isAuthenticated: false});
+          return throwError(err);
+        })
+      );
   }
 
   private validateToken(): Observable<{id: string, isAuthenticated: boolean}> {
